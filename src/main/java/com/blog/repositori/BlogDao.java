@@ -1,6 +1,6 @@
-package dao;
+package com.blog.repositori;
 
-import model.Blog;
+import com.blog.model.Blog;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.EntityManager;

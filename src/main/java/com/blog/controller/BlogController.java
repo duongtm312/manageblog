@@ -1,20 +1,23 @@
-package controller;
+package com.blog.controller;
 
-import dao.BlogDao;
-import model.Blog;
+import com.blog.model.Comment;
+import com.blog.repositori.BlogDao;
+import com.blog.model.Blog;
+import com.blog.service.BlogService;
+import com.blog.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -24,13 +27,14 @@ public class BlogController {
     @Value("${file-upload}")
     private String fileUpload;
     @Autowired
-    BlogDao blogDao;
+    BlogService blogService;
+    @Autowired
+    CommentService commentService;
 
     @GetMapping("")
-    public ModelAndView showBlog() {
+    public ModelAndView showBlog(@RequestParam(defaultValue = "0") int page) {
         ModelAndView modelAndView = new ModelAndView("index");
-        List<Blog> blogs = blogDao.getList();
-        modelAndView.addObject("blog", blogs);
+        modelAndView.addObject("blog", blogService.getAll(PageRequest.of(page, 3, Sort.by("idBlog"))));
         return modelAndView;
     }
 
@@ -44,25 +48,44 @@ public class BlogController {
                 e.printStackTrace();
             }
             blog.setImgSrc("/img/" + nameImg);
-            blogDao.save(blog);
+            blogService.save(blog);
         }
         return "redirect:/blog";
     }
 
     @GetMapping("/post/{id}")
-    public String showPost(@PathVariable int id,Model model) {
-
-      model.addAttribute("blog",blogDao.findById(id));
+    public String showPost(@PathVariable int id, Model model) {
+        Blog blog = blogService.findById(id);
+        model.addAttribute("blog", blogService.findById(id));
+        List<Comment>comments = commentService.getAll(blogService.findById(id));
+        model.addAttribute("comment",comments);
         return "single-post";
     }
-    @GetMapping("/edit/{id}")
-    public String showEdit(@PathVariable int id,Model model) {
+    @PostMapping("/post/{id}")
+    public String comment(@PathVariable int id, Model model,@RequestParam("nameComment") String nameComment,
+                          @RequestParam("contentComment") String contentComment) {
+        Blog blog = blogService.findById(id);
+        Comment comment = new Comment();
+        comment.setBlog(blog);
+        comment.setContentComment(contentComment);
+        comment.setNameComment(nameComment);
+        commentService.save(comment);
 
-        model.addAttribute("blog",blogDao.findById(id));
+        model.addAttribute("blog", blogService.findById(id));
+        List<Comment>comments = commentService.getAll(blogService.findById(id));
+        model.addAttribute("comment",comments);
+        return "single-post";
+    }
+
+    @GetMapping("/edit/{id}")
+    public String showEdit(@PathVariable int id, Model model) {
+
+        model.addAttribute("blog", blogService.findById(id));
         return "edit";
     }
+
     @PostMapping("/edit")
-    public String editPost(@ModelAttribute Blog blog, @RequestParam(value = "file", required = false) MultipartFile file){
+    public String editPost(@ModelAttribute Blog blog, @RequestParam(value = "file", required = false) MultipartFile file) {
         if (file.getSize() != 0) {
             try {
                 File file1 = new File(fileUpload + blog.getImgSrc());
@@ -79,7 +102,8 @@ public class BlogController {
             blog.setImgSrc("/img/" + nameImg);
 
         }
-        blogDao.edit(blog);
+        blogService.save(blog);
         return "single-post";
     }
+
 }

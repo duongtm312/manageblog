@@ -1,4 +1,4 @@
-package configuration;
+package com.blog.configuration;
 
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 

@@ -11,8 +11,8 @@
     <div class="modal fade" id="subsModal" tabindex="-1" role="dialog" aria-labelledby="subsModal" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
-                </button>
+                <a th:href="@{/blog/post/{id}(id=${blog.getIdBlog()})}" type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </a>
                 <div class="modal-body">
                     <h5 class="title">Edit My Blog</h5>
 

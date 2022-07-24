@@ -1,4 +1,4 @@
-package model;
+package com.blog.model;
 
 import javax.persistence.*;
 
@@ -8,6 +8,7 @@ public class Blog {
 @GeneratedValue (strategy = GenerationType.IDENTITY)
     private int idBlog;
     private String imgSrc;
+    @Column(length = 100000)
     private String title;
     @Column(length = 10000000)
     private String content;
