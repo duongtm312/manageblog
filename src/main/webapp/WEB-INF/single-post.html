@@ -16,6 +16,18 @@
 
     <!-- Style CSS -->
     <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        .fa {
+            font-size: 50px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .fa:hover {
+            color: darkblue;
+        }
+    </style>
 
 </head>
 
@@ -232,6 +244,14 @@
                                 <p>By <a href="#">james smith</a></p>
                                 <p th:text="${comment.size()}+comments"> </p>
                             </div>
+                            <div class="post-meta mb-50">
+                                <a th:href="@{/blog/like/{idBlog}(idBlog = ${blog.getIdBlog()})}"><i class="fa fa-thumbs-up" ></i></a>
+                                <i size="10px" th:text="${likes}"> </i>
+                                <a th:href="@{/blog/dislikes/{idBlog}(idBlog = ${blog.getIdBlog()})}"><i class="fa fa-thumbs-down" ></i></a>
+                                <i size="10px" th:text="${dislikes}"> </i>
+                            </div>
+
+
                       <p th:text="${blog.getContent()}"></p>
 
 

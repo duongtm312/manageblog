@@ -1,10 +1,12 @@
 package com.blog.controller;
 
 import com.blog.model.Comment;
+import com.blog.model.Likes;
 import com.blog.repositori.BlogDao;
 import com.blog.model.Blog;
 import com.blog.service.BlogService;
 import com.blog.service.CommentService;
+import com.blog.service.LikeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
@@ -30,6 +32,8 @@ public class BlogController {
     BlogService blogService;
     @Autowired
     CommentService commentService;
+    @Autowired
+    LikeService likeService;
 
     @GetMapping("")
     public ModelAndView showBlog(@RequestParam(defaultValue = "0") int page) {
@@ -56,13 +60,16 @@ public class BlogController {
     @GetMapping("/post/{id}")
     public String showPost(@PathVariable int id, Model model) {
         Blog blog = blogService.findById(id);
-        model.addAttribute("blog", blogService.findById(id));
-        List<Comment>comments = commentService.getAll(blogService.findById(id));
-        model.addAttribute("comment",comments);
+        model.addAttribute("blog", blog);
+        model.addAttribute("likes", likeService.getSizeLike(id));
+        model.addAttribute("dislikes", likeService.getSizeDisLike(id));
+        List<Comment> comments = commentService.getAll(blogService.findById(id));
+        model.addAttribute("comment", comments);
         return "single-post";
     }
+
     @PostMapping("/post/{id}")
-    public String comment(@PathVariable int id, Model model,@RequestParam("nameComment") String nameComment,
+    public String comment(@PathVariable int id, Model model, @RequestParam("nameComment") String nameComment,
                           @RequestParam("contentComment") String contentComment) {
         Blog blog = blogService.findById(id);
         Comment comment = new Comment();
@@ -72,9 +79,28 @@ public class BlogController {
         commentService.save(comment);
 
         model.addAttribute("blog", blogService.findById(id));
-        List<Comment>comments = commentService.getAll(blogService.findById(id));
-        model.addAttribute("comment",comments);
+        List<Comment> comments = commentService.getAll(blogService.findById(id));
+        model.addAttribute("comment", comments);
         return "single-post";
+    }
+
+    @GetMapping("/like/{idBlog}")
+    private ModelAndView like(@PathVariable int idBlog) {
+        Likes likes = new Likes();
+        likes.setStatus(true);
+        likes.setBlog(blogService.findById(idBlog));
+        likeService.save(likes);
+        ModelAndView modelAndView = new ModelAndView("redirect:/blog/post/"+idBlog);
+        return modelAndView;
+    }
+    @GetMapping("/dislikes/{idBlog}")
+    private ModelAndView dislike(@PathVariable int idBlog) {
+        Likes likes = new Likes();
+        likes.setStatus(false);
+        likes.setBlog(blogService.findById(idBlog));
+        likeService.save(likes);
+        ModelAndView modelAndView = new ModelAndView("redirect:/blog/post/"+idBlog);
+        return modelAndView;
     }
 
     @GetMapping("/edit/{id}")
