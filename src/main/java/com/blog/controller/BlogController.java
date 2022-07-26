@@ -1,5 +1,6 @@
 package com.blog.controller;
 
+import com.blog.model.Account;
 import com.blog.model.Comment;
 import com.blog.model.Likes;
 import com.blog.repositori.BlogDao;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -34,10 +36,18 @@ public class BlogController {
     CommentService commentService;
     @Autowired
     LikeService likeService;
+    @Autowired
+    HttpSession httpSession;
 
     @GetMapping("")
     public ModelAndView showBlog(@RequestParam(defaultValue = "0") int page) {
         ModelAndView modelAndView = new ModelAndView("index");
+       Account account = (Account) httpSession.getAttribute("account");
+       if (account==null){
+           return new ModelAndView("/login");
+       }else {
+           modelAndView.addObject("account",account);
+       }
         modelAndView.addObject("blog", blogService.getAll(PageRequest.of(page, 3, Sort.by("idBlog"))));
         return modelAndView;
     }

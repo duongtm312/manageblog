@@ -16,7 +16,6 @@ public class Account {
     private String useName;
     @Size(min = 6,max = 15)
     private String passWord;
-    @Pattern(regexp = "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$")
     private String mail;
 
     public Account(int idAccount, String useName, String passWord, String mail) {
