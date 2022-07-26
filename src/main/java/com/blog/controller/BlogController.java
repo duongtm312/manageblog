@@ -84,22 +84,38 @@ public class BlogController {
         return "single-post";
     }
 
+    @PostMapping("/repy/{id}/{idcom}")
+    public ModelAndView repy(@PathVariable int id, @PathVariable int idcom, @RequestParam("nameComment") String nameComment,
+                             @RequestParam("contentComment") String contentComment) {
+
+        Comment comment = new Comment();
+        comment.setComment(commentService.finById(idcom));
+        comment.setContentComment(contentComment);
+        comment.setNameComment(nameComment);
+        comment.setBlog(blogService.findById(id));
+        commentService.save(comment);
+        ModelAndView modelAndView = new ModelAndView("redirect:/blog/post/" + id);
+        return modelAndView;
+
+    }
+
     @GetMapping("/like/{idBlog}")
     private ModelAndView like(@PathVariable int idBlog) {
         Likes likes = new Likes();
         likes.setStatus(true);
         likes.setBlog(blogService.findById(idBlog));
         likeService.save(likes);
-        ModelAndView modelAndView = new ModelAndView("redirect:/blog/post/"+idBlog);
+        ModelAndView modelAndView = new ModelAndView("redirect:/blog/post/" + idBlog);
         return modelAndView;
     }
+
     @GetMapping("/dislikes/{idBlog}")
     private ModelAndView dislike(@PathVariable int idBlog) {
         Likes likes = new Likes();
         likes.setStatus(false);
         likes.setBlog(blogService.findById(idBlog));
         likeService.save(likes);
-        ModelAndView modelAndView = new ModelAndView("redirect:/blog/post/"+idBlog);
+        ModelAndView modelAndView = new ModelAndView("redirect:/blog/post/" + idBlog);
         return modelAndView;
     }
 

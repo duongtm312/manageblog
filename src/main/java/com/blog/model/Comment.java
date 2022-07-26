@@ -9,16 +9,26 @@ public class Comment {
     private int idComment;
     @Column(length = 1000)
     private String contentComment;
+    @ManyToOne
+    private Comment comment;
     private String nameComment;
     @ManyToOne
     private Blog blog;
 
-
-    public Comment(int idComment, String contentComment, String nameComment, Blog blog) {
+    public Comment(int idComment, String contentComment, Comment comment, String nameComment, Blog blog) {
         this.idComment = idComment;
         this.contentComment = contentComment;
+        this.comment = comment;
         this.nameComment = nameComment;
         this.blog = blog;
+    }
+
+    public Comment getComment() {
+        return comment;
+    }
+
+    public void setComment(Comment comment) {
+        this.comment = comment;
     }
 
     public String getNameComment() {

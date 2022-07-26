@@ -20,4 +20,7 @@ public class CommentService {
     public void save(Comment comment){
         iCommentRepo.save(comment);
     }
+    public Comment finById(int id){
+        return iCommentRepo.findById(id).get();
+    }
 }
