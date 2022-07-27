@@ -19,6 +19,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.IOException;
@@ -40,14 +43,14 @@ public class BlogController {
     HttpSession httpSession;
 
     @GetMapping("")
-    public ModelAndView showBlog(@RequestParam(defaultValue = "0") int page) {
+    public ModelAndView showBlog(@RequestParam(defaultValue = "0") int page, HttpServletRequest request) {
         ModelAndView modelAndView = new ModelAndView("index");
-       Account account = (Account) httpSession.getAttribute("account");
-       if (account==null){
-           return new ModelAndView("/login");
-       }else {
-           modelAndView.addObject("account",account);
-       }
+        Account account = (Account) httpSession.getAttribute("account");
+        if (account == null) {
+            return new ModelAndView("/login");
+        } else {
+            modelAndView.addObject("account", account);
+        }
         modelAndView.addObject("blog", blogService.getAll(PageRequest.of(page, 3, Sort.by("idBlog"))));
         return modelAndView;
     }
@@ -111,20 +114,42 @@ public class BlogController {
 
     @GetMapping("/like/{idBlog}")
     private ModelAndView like(@PathVariable int idBlog) {
-        Likes likes = new Likes();
-        likes.setStatus(true);
-        likes.setBlog(blogService.findById(idBlog));
-        likeService.save(likes);
+        Account account = (Account) httpSession.getAttribute("account");
+        Likes disLike = likeService.findLike(idBlog, account.getIdAccount(),false);
+        if (disLike!=null){
+            likeService.delete(disLike.getIdLike());
+        }
+        Likes like = likeService.findLike(idBlog, account.getIdAccount(),true);
+        if (like != null) {
+            likeService.delete(like.getIdLike());
+        } else {
+            Likes likes = new Likes();
+            likes.setStatus(true);
+            likes.setAccount(account);
+            likes.setBlog(blogService.findById(idBlog));
+            likeService.save(likes);
+        }
         ModelAndView modelAndView = new ModelAndView("redirect:/blog/post/" + idBlog);
         return modelAndView;
     }
 
     @GetMapping("/dislikes/{idBlog}")
     private ModelAndView dislike(@PathVariable int idBlog) {
-        Likes likes = new Likes();
-        likes.setStatus(false);
-        likes.setBlog(blogService.findById(idBlog));
-        likeService.save(likes);
+        Account account = (Account) httpSession.getAttribute("account");
+        Likes like = likeService.findLike(idBlog, account.getIdAccount(),true);
+        if (like!=null){
+            likeService.delete(like.getIdLike());
+        }
+        Likes disLike = likeService.findLike(idBlog, account.getIdAccount(),false);
+        if (disLike != null) {
+            likeService.delete(disLike.getIdLike());
+        } else {
+            Likes likes = new Likes();
+            likes.setStatus(false);
+            likes.setAccount(account);
+            likes.setBlog(blogService.findById(idBlog));
+            likeService.save(likes);
+        }
         ModelAndView modelAndView = new ModelAndView("redirect:/blog/post/" + idBlog);
         return modelAndView;
     }

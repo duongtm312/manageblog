@@ -7,6 +7,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 @Controller
@@ -22,7 +24,7 @@ public class LoginController {
     }
 
     @PostMapping("/login")
-    public String loginHome(@RequestParam String mail, @RequestParam String password) {
+    public String loginHome(@RequestParam String mail, @RequestParam String password, Account acc, HttpServletResponse response) {
         Account account = accountService.findByMail(mail);
         if (account != null) {
             if (account.getPassWord().equals(password)) {

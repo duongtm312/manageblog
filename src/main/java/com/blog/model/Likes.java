@@ -10,6 +10,8 @@ public class Likes {
     @ManyToOne
     private Blog blog;
     private boolean status;
+    @ManyToOne
+    Account account;
 
 
     public Likes() {
@@ -24,10 +26,19 @@ public class Likes {
         this.status = status;
     }
 
-    public Likes(int idLike, Blog blog, boolean status) {
+    public Likes(int idLike, Blog blog, boolean status, Account account) {
         this.idLike = idLike;
         this.blog = blog;
         this.status = status;
+        this.account = account;
+    }
+
+    public Account getAccount() {
+        return account;
+    }
+
+    public void setAccount(Account account) {
+        this.account = account;
     }
 
     public int getIdLike() {

@@ -9,13 +9,24 @@ import org.springframework.stereotype.Service;
 public class LikeService {
     @Autowired
     ILikeRepo iLikeRepo;
-    public int getSizeLike(int idBlog){
+
+    public int getSizeLike(int idBlog) {
         return iLikeRepo.findAllByIdBlogLike(idBlog).size();
     }
-    public int getSizeDisLike(int idBlog){
+
+    public int getSizeDisLike(int idBlog) {
         return iLikeRepo.findAllByIdBlogDisLike(idBlog).size();
     }
-    public void save(Likes like){
+
+    public void save(Likes like) {
         iLikeRepo.save(like);
+    }
+
+    public Likes findLike(int idBlog, int idAcc,boolean status) {
+        return iLikeRepo.findLike(idBlog, idAcc,status);
+    }
+
+    public void delete(int id) {
+        iLikeRepo.deleteById(id);
     }
 }
